@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <title>Boolflix</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.6/handlebars.js"></script>
@@ -26,7 +26,12 @@
     <!-- Template Handlebars -->
     <script id="film-template" type="text/x-handlebars-template">
       <li class="singolo-film">
-        {{ titolo_originale }}
+        <ul class="dettagli-film">
+          <li>Titolo: {{ titolo }}</li>
+          <li>Titolo originale: {{ titolo_originale }}</li>
+          <li>Lingua: {{ lingua }}</li>
+          <li>Voto: {{ voto }}</li>
+        </ul>
       </li>
     </script>
 
