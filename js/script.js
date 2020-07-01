@@ -29,14 +29,38 @@ $(document).ready(
             method: 'GET',
             data: {
               api_key: '4cc6118b11d73c4c0274675794143586',
-              query: 'ted', // TODO: $('#ricerca').val()
+              query: 'ritorno al futuro', // TODO: $('#ricerca').val()
               language: 'it-IT'
             },
             success: function(rispostAPI) {
-              console.log(rispostAPI);
+              // console.log(rispostAPI);
               // console.log(rispostAPI.total_results);
               // console.log(rispostAPI.total_pages);
-              console.log(rispostAPI.results);
+
+              var arrayObjFilm = rispostAPI.results;
+              console.log(arrayObjFilm);
+
+              // Preparo il template handlebars
+              // a cui darò in pasto il mio singoloFilm formattato
+              var source = $("#film-template").html();
+              var template = Handlebars.compile(source);
+
+              // Ciclo gli oggetti dell'array ricevuto
+              for (var i = 0; i < arrayObjFilm.length; i++) {
+                var singoloFilmAPI = arrayObjFilm[i];
+                console.log(singoloFilmAPI);
+                // console.log(singoloFilmAPI.original_title);
+
+                var singoloFilm = {
+                  titolo_originale: singoloFilmAPI.original_title,
+                  titolo: singoloFilmAPI.title
+                };
+                console.log(singoloFilm);
+
+                var html = template(singoloFilm);
+                console.log(html);
+                $('.lista-films').append(html);
+              }
 
 
             },
