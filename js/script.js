@@ -31,6 +31,18 @@
 // Qui un esempio di chiamata per le serie tv:
 // https://api.themoviedb.org/3/search/tv?api_key=e99307154c6dfb0b4750f6603256716d&language=it_IT&query=scrubs
 
+// Milestone 3:
+// In questa milestone come prima cosa aggiungiamo la copertina del film o della serie al nostro elenco.
+// Ci viene passata dall’API solo la parte finale dell’URL,
+// questo perché poi potremo generare da quella porzione di URL tante dimensioni diverse.
+// Dovremo prendere quindi l’URL base delle immagini di TMDB: https://image.tmdb.org/t/p/
+// per poi aggiungere la dimensione che vogliamo generare
+// (troviamo tutte le dimensioni possibili a questo link: https://www.themoviedb.org/talk/53c11d4ec3a3684cf4006400)
+// per poi aggiungere la parte finale dell’URL passata dall’API.
+// Esempi di URL che tornano delle copertine:
+// https://image.tmdb.org/t/p/w185/s2VDcsMh9ZhjFUxw77uCFDpTuXp.jpg
+// https://image.tmdb.org/t/p/w1280/aF8jc8Umf8gmRDm7H7gVw7xzItJ.jpg
+
 
 ////////// Dettagli chiamata AJAX:
 // endpoint: https://api.themoviedb.org/3/search/movie
@@ -118,16 +130,15 @@ $(document).ready(
             query: parolaCercata,
             language: 'it-IT'
           },
-          success: function(rispostAPI) {
+          success: function(rispostaAPI) {
 
             ////////// Array di ritorno chiamata Ajax
-            var arrayObjVideo = rispostAPI.results;
-            console.log(arrayObjVideo);
+            var arrayObjVideo = rispostaAPI.results;
 
             // Se l'array che mi torna è vuoto, stampo un messaggio di errore
             if (arrayObjVideo.length > 0) {
 
-              stampaVideo(arrayObjVideo, tipologia)
+              stampaVideo(arrayObjVideo, tipologia);
             } else {
 
               ////////// Imposto un messaggio di errore
@@ -157,17 +168,29 @@ $(document).ready(
       // in base alla tipologia di video da stampare
       var source = $("#film-template").html();
       var template = Handlebars.compile(source);
-      console.log(template);
 
       switch (tipologia) {
         case 'movie':
-        stampaFilm(arrayObj, template)
+        stampaFilm(arrayObj, template);
           break;
         case 'tv':
-        stampaSerieTV(arrayObj, template)
+        stampaSerieTV(arrayObj, template);
           break;
         default:  // TODO: cosa ci potrei mettere?
       }
+    }
+
+    ////////// OTTIENI URL IMMAGINI
+    // Funzione che concatena due stringhe
+    // che servono per formare un percorso parziale
+    // per la ricerca delle copertine video
+    // return: stringa percorso parziale
+    function ottieniUrlImmagini() {
+
+      var urlBaseImmagine = 'https://image.tmdb.org/t/p/';
+      var formatoImmagine = 'w500';  // Array ["w92", "w154", "w185", "w342", "w500", "w780", "original"]
+
+      return urlBaseImmagine + formatoImmagine;
     }
 
     ////////// STAMPA FILM
@@ -179,6 +202,7 @@ $(document).ready(
     // Queste variabili diventano poi i valori del nuovo oggetto che andrò a stampare
     // return: niente
     function stampaFilm(arrayObj, template) {
+      var urlParziale = ottieniUrlImmagini();
 
       // Ciclo gli oggetti dell'array ricevuto
       for (var i = 0; i < arrayObj.length; i++) {
@@ -187,13 +211,29 @@ $(document).ready(
         var singoloVideoAPI = arrayObj[i];
 
         ////////// Lista variabili
+        var immagine = singoloVideoAPI.poster_path;
         var titoloOriginale = singoloVideoAPI.original_title;
         var titolo = singoloVideoAPI.title;
         var lingua = singoloVideoAPI.original_language;
         var voto = singoloVideoAPI.vote_average;
+        var immagineCopertina;
+
+        // controllo che la risposta dell'immagine non sia nulla
+        // se è nulla
+        //  --> imposto un'immagine di default
+        // altrimenti
+        //  --> concateno la risposta all'url parziale
+        if (immagine == null) {
+
+          immagineCopertina = 'img/non_disponibile.png';
+        } else {
+
+          immagineCopertina = urlParziale + immagine;
+        }
 
         ////////// Oggetto Handlebars
         var singoloFilm = {
+          immagine: immagineCopertina,
           titolo_originale: titoloOriginale,
           titolo: titolo,
           tipologia: 'Film',
@@ -216,6 +256,7 @@ $(document).ready(
     // Queste variabili diventano poi i valori del nuovo oggetto che andrò a stampare
     // return: niente
     function stampaSerieTV(arrayObj,template) {
+      var urlParziale = ottieniUrlImmagini();
 
       // Ciclo gli oggetti dell'array ricevuto
       for (var i = 0; i < arrayObj.length; i++) {
@@ -224,13 +265,29 @@ $(document).ready(
         var singoloVideoAPI = arrayObj[i];
 
         ////////// Lista variabili
+        var immagine = singoloVideoAPI.poster_path;
         var titoloOriginale = singoloVideoAPI.original_name;
         var titolo = singoloVideoAPI.name;
         var lingua = singoloVideoAPI.original_language;
         var voto = singoloVideoAPI.vote_average;
+        var immagineCopertina;
+
+        // controllo che la risposta dell'immagine non sia nulla
+        // se è nulla
+        //  --> imposto un'immagine di default
+        // altrimenti
+        //  --> concateno la risposta all'url parziale
+        if (immagine == null) {
+
+          immagineCopertina = 'img/non_disponibile.png';
+        } else {
+
+          immagineCopertina = urlParziale + immagine;
+        }
 
         ////////// Oggetto Handlebars
         var singoloFilm = {
+          immagine: immagineCopertina,
           titolo_originale: titoloOriginale,
           titolo: titolo,
           tipologia: 'Serie TV',

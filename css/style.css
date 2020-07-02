@@ -5,6 +5,10 @@
   box-sizing: border-box;
 }
 /* FINE RESET */
+.copertina {
+  width: 200px;
+  height: 300px;
+}
 
 .bandiera {
   width: 20px;
