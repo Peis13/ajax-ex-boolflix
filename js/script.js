@@ -85,49 +85,6 @@ $(document).ready(
 
     // -------------------------- FUNZIONI -------------------------- //
 
-    ////////// STAMPA FILM
-    // Funzione che stampa a schermo i dettagli del film cercato
-    //  --> arrayObj: array di oggetti che serve alla funzione come argomento
-    // return: niente
-    function stampaFilm(arrayObj) {
-
-      // Preparo il template handlebars
-      // a cui darò in pasto il mio singoloFilm formattato
-      var source = $("#film-template").html();
-      var template = Handlebars.compile(source);
-
-
-      // Ciclo gli oggetti dell'array ricevuto
-      for (var i = 0; i < arrayObj.length; i++) {
-
-        ////////// Oggetto API
-        var singoloFilmAPI = arrayObj[i];
-
-        // Creo una lista di variabili
-        // che corrispondono ai valori di ritono della chiamata.
-        // Queste variabili diventano poi
-        // i valori del nuovo oggetto che andrò a stampare
-
-        ////////// Lista variabili
-        var titoloOriginale = singoloFilmAPI.original_title;
-        var titolo = singoloFilmAPI.title;
-        var lingua = singoloFilmAPI.original_language;
-        var voto = singoloFilmAPI.vote_average;
-
-        ////////// Oggetto Handlebars
-        var singoloFilm = {
-          titolo_originale: titoloOriginale,
-          titolo: titolo,
-          lingua: lingua,
-          voto: voto
-        };
-
-        // Stampo nell'html singoloFilm
-        var html = template(singoloFilm);
-        $('.lista-films').append(html);
-      }
-    }
-
     ////////// OTTIENI RICERCA
     // Funzione che genera una chiamata Ajax
     // prende il valore inserito nella input #ricerca e lo setta come query per la chiamata
@@ -176,6 +133,90 @@ $(document).ready(
           }
         }
       );
+    }
+
+    ////////// STAMPA FILM
+    // Funzione che stampa a schermo i dettagli del film cercato
+    //  --> arrayObj: array di oggetti che serve alla funzione come argomento
+    // return: niente
+    function stampaFilm(arrayObj) {
+
+      // Preparo il template handlebars
+      // a cui darò in pasto il mio singoloFilm formattato
+      var source = $("#film-template").html();
+      var template = Handlebars.compile(source);
+
+
+      // Ciclo gli oggetti dell'array ricevuto
+      for (var i = 0; i < arrayObj.length; i++) {
+
+        ////////// Oggetto API
+        var singoloFilmAPI = arrayObj[i];
+
+        // Creo una lista di variabili
+        // che corrispondono ai valori di ritono della chiamata.
+        // Queste variabili diventano poi
+        // i valori del nuovo oggetto che andrò a stampare
+
+        ////////// Lista variabili
+        var titoloOriginale = singoloFilmAPI.original_title;
+        var titolo = singoloFilmAPI.title;
+        var lingua = singoloFilmAPI.original_language;
+        var voto = singoloFilmAPI.vote_average;
+
+        // Il voto che ricevo dall'API è su una scala da 0 a 10
+        // il mio range di valutazione invece va da 0 a 5
+        //  --> per prima cosa divido per 2 il voto ricevuto e lo arrotondo per eccesso
+        //  --> quindi genero le stelle che inserirò nell'oggetto handlebars
+        var valutazione = Math.ceil(voto / 2);
+        var stelle = generaStelle(valutazione);
+
+        ////////// Oggetto Handlebars
+        var singoloFilm = {
+          titolo_originale: titoloOriginale,
+          titolo: titolo,
+          lingua: lingua,
+          valutazione: stelle
+        };
+        console.log(lingua);
+
+        $('.lingua img').on('error', function() {
+          console.log(this);
+          // $(this).attr('src', 'img/it.png')
+          // $(this).parent().append(lingua)
+        }).parent().append(lingua);
+
+        // Stampo nell'html singoloFilm
+        var html = template(singoloFilm);
+        $('.lista-films').append(html);
+      }
+    }
+
+    ////////// GENERA STELLE
+    // Funzione che genera delle stelle
+    //  --> valutazione: come argomento gli passo un numero che identifica una valutazione
+    // Faccio un ciclo for per visualizzare la valutazione con delle stelle
+    // con un range di valutazione massima di 5
+    // ogni ciclo rappresenta il riempimento di una stellina
+    //  --> se la valutazione è maggiore dell'indice del ciclo
+    //      --> stellina piena
+    //  --> altrimenti
+    //      --> stellina vuota
+    // return: stelle formattate
+    function generaStelle(valutazione) {
+      var rangeValutazione = 5;
+      var stelle = '';
+      for (var i = 1; i <= rangeValutazione; i++) {
+
+        if (i <= valutazione) {
+
+          stelle += '<i class="fas fa-star"></i>';
+        } else {
+
+          stelle += '<i class="far fa-star"></i>';
+        }
+      }
+      return stelle;
     }
 
     ////////// STAMPA ERRORE
