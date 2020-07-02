@@ -23,7 +23,8 @@
     <ul class="lista-films"></ul>
     <!-- Fine Lista Film -->
 
-    <!-- Template Handlebars -->
+    <!-- TEMPLATE HANDLEBARS -->
+    <!-- Film -->
     <script id="film-template" type="text/x-handlebars-template">
       <li class="singolo-film">
         <ul class="dettagli-film">
@@ -33,6 +34,11 @@
           <li>Voto: {{ voto }}</li>
         </ul>
       </li>
+    </script>
+
+    <!-- Messaggio di errore -->
+    <script id="messaggio-template" type="text/x-handlebars-template">
+      <p class="errore">{{ messaggio }}</p>
     </script>
 
     <!-- link javascript -->
