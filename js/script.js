@@ -53,9 +53,13 @@ $(document).ready(
     $('#cerca').click(
       function() {
 
+        var film = 'movie';
+        var serieTV = 'tv';
+
         // valore della input inserito nel campo ricerca
-        var filmCercato = $('#ricerca').val();
-        ottieniRicerca(filmCercato);
+        var parolaCercata = $('#ricerca').val();
+        ottieniVideo(film, parolaCercata);
+        ottieniVideo(serieTV, parolaCercata);
 
         // infine cancello il testo scritto nella input
         resetInput();
@@ -68,11 +72,15 @@ $(document).ready(
     $('#ricerca').keypress(
       function() {
 
+        var film = 'movie';
+        var serieTV = 'tv';
+
         if ((event.which === 13) || (event.keyCode === 13)) {
 
           // valore della input inserito nel campo ricerca
-          var filmCercato = $('#ricerca').val();
-          ottieniRicerca(filmCercato);
+          var parolaCercata = $('#ricerca').val();
+          ottieniVideo(film, parolaCercata);
+          ottieniVideo(serieTV, parolaCercata);
 
           // infine cancello il testo scritto nella input
           resetInput();
@@ -80,51 +88,46 @@ $(document).ready(
       }
     );
 
-
-
-    // $(document).on('error', '.bandiera', function(){
-    //   console.log($(this));
-    //   $('.lingua img').replaceWith(55)
-    //
-    // });
                         // ----- Fine Ricerca Film ----- //
 
     // -------------------------- FINE LOGICA -------------------------- //
 
     // -------------------------- FUNZIONI -------------------------- //
 
-    ////////// OTTIENI RICERCA
+    ////////// OTTIENI VIDEO
     // Funzione che genera una chiamata Ajax
     // prende il valore inserito nella input #ricerca e lo setta come query per la chiamata
-    //  --> filmCercato: stringa che serve alla funzione come argomento
+    //  --> tipologia: stringa che rappresenta la tipologia di video
+    //  --> parolaCercata: stringa che l'utente inserisce nella input #ricerca
     //      per generare la query all'API
     // return: niente
-    function ottieniRicerca(filmCercato) {
-      resetHtml()
+    function ottieniVideo(tipologia, parolaCercata) {
+      resetHtml() // TODO: chiedere se va bene qui nel caso in cui ho due chiamate
 
       ////////// Info chiamata
       // metto i dettagli della chamata Ajax in delle variabili
-      var url = 'https://api.themoviedb.org/3/search/movie';
+      var url = 'https://api.themoviedb.org/3/search/';
       var api_key = '4cc6118b11d73c4c0274675794143586';
 
       $.ajax(
         {
-          url: url,
+          url: url + tipologia,
           method: 'GET',
           data: {
             api_key: api_key,
-            query: filmCercato,
+            query: parolaCercata,
             language: 'it-IT'
           },
           success: function(rispostAPI) {
 
             ////////// Array di ritorno chiamata Ajax
-            var arrayObjFilm = rispostAPI.results;
+            var arrayObjVideo = rispostAPI.results;
+            console.log(arrayObjVideo);
 
             // Se l'array che mi torna è vuoto, stampo un messaggio di errore
-            if (arrayObjFilm.length > 0) {
+            if (arrayObjVideo.length > 0) {
 
-              stampaFilm(arrayObjFilm)
+              stampaVideo(arrayObjVideo, tipologia)
             } else {
 
               ////////// Imposto un messaggio di errore
@@ -143,55 +146,97 @@ $(document).ready(
       );
     }
 
-    ////////// STAMPA FILM
-    // Funzione che stampa a schermo i dettagli del film cercato
+    ////////// STAMPA VIDEO
+    // Funzione che stampa a schermo i dettagli del video cercato
     //  --> arrayObj: array di oggetti che serve alla funzione come argomento
+    //  --> tipologia: stringa che serve alla funzione per decidere se stampare film oppure serie TV
     // return: niente
-    function stampaFilm(arrayObj) {
+    function stampaVideo(arrayObj, tipologia) {
 
-      // Preparo il template handlebars
-      // a cui darò in pasto il mio singoloFilm formattato
+      // Preparo il template handlebars che passerò alle funzioni
+      // in base alla tipologia di video da stampare
       var source = $("#film-template").html();
       var template = Handlebars.compile(source);
+      console.log(template);
 
+      switch (tipologia) {
+        case 'movie':
+        stampaFilm(arrayObj, template)
+          break;
+        case 'tv':
+        stampaSerieTV(arrayObj, template)
+          break;
+        default:  // TODO: cosa ci potrei mettere?
+      }
+    }
+
+    ////////// STAMPA FILM
+    // Funzione che stampa a schermo i dettagli del film
+    //  --> arrayObj: array di oggetti che serve alla funzione come argomento
+    //  --> template: funzione che serve per stampare il template handlebars
+    //      a cui darò in pasto il mio singoloFilm formattato
+    // Creo una lista di variabili che corrispondono ai valori di ritono della chiamata.
+    // Queste variabili diventano poi i valori del nuovo oggetto che andrò a stampare
+    // return: niente
+    function stampaFilm(arrayObj, template) {
 
       // Ciclo gli oggetti dell'array ricevuto
       for (var i = 0; i < arrayObj.length; i++) {
 
         ////////// Oggetto API
-        var singoloFilmAPI = arrayObj[i];
-
-        // Creo una lista di variabili
-        // che corrispondono ai valori di ritono della chiamata.
-        // Queste variabili diventano poi
-        // i valori del nuovo oggetto che andrò a stampare
+        var singoloVideoAPI = arrayObj[i];
 
         ////////// Lista variabili
-        var titoloOriginale = singoloFilmAPI.original_title;
-        var titolo = singoloFilmAPI.title;
-        var lingua = singoloFilmAPI.original_language;
-        var voto = singoloFilmAPI.vote_average;
-
-        // Il voto che ricevo dall'API è su una scala da 0 a 10
-        // il mio range di valutazione invece va da 0 a 5
-        //  --> per prima cosa divido per 2 il voto ricevuto e lo arrotondo per eccesso
-        //  --> quindi genero le stelle che inserirò nell'oggetto handlebars
-        var valutazione = Math.ceil(voto / 2);
+        var titoloOriginale = singoloVideoAPI.original_title;
+        var titolo = singoloVideoAPI.title;
+        var lingua = singoloVideoAPI.original_language;
+        var voto = singoloVideoAPI.vote_average;
 
         ////////// Oggetto Handlebars
         var singoloFilm = {
           titolo_originale: titoloOriginale,
           titolo: titolo,
+          tipologia: 'Film',
           lingua: stampaBandiera(lingua),
-          valutazione: generaStelle(valutazione)
+          valutazione: generaStelle(voto)
         };
 
-        // $('.bandiera').on('error', function() {
-        //   // console.log($(this));
-        //   // var lingua = $('.lingua img').attr('data-lingua')
-        //   // console.log(lingua);
-        //   $(this).attr('src', 'img/it.png')
-        // })
+        // Stampo nell'html singoloFilm
+        var html = template(singoloFilm);
+        $('.lista-films').append(html);
+      }
+    }
+
+    ////////// STAMPA SERIE TV
+    // Funzione che stampa a schermo i dettagli della serie TV
+    //  --> arrayObj: array di oggetti che serve alla funzione come argomento
+    //  --> template: funzione che serve per stampare il template handlebars
+    //      a cui darò in pasto il mio singoloFilm formattato
+    // Creo una lista di variabili che corrispondono ai valori di ritono della chiamata.
+    // Queste variabili diventano poi i valori del nuovo oggetto che andrò a stampare
+    // return: niente
+    function stampaSerieTV(arrayObj,template) {
+
+      // Ciclo gli oggetti dell'array ricevuto
+      for (var i = 0; i < arrayObj.length; i++) {
+
+        ////////// Oggetto API
+        var singoloVideoAPI = arrayObj[i];
+
+        ////////// Lista variabili
+        var titoloOriginale = singoloVideoAPI.original_name;
+        var titolo = singoloVideoAPI.name;
+        var lingua = singoloVideoAPI.original_language;
+        var voto = singoloVideoAPI.vote_average;
+
+        ////////// Oggetto Handlebars
+        var singoloFilm = {
+          titolo_originale: titoloOriginale,
+          titolo: titolo,
+          tipologia: 'Serie TV',
+          lingua: stampaBandiera(lingua),
+          valutazione: generaStelle(voto)
+        };
 
         // Stampo nell'html singoloFilm
         var html = template(singoloFilm);
@@ -201,18 +246,24 @@ $(document).ready(
 
     ////////// GENERA STELLE
     // Funzione che genera delle stelle
-    //  --> valutazione: come argomento gli passo un numero che identifica una valutazione
-    // Faccio un ciclo for per visualizzare la valutazione con delle stelle
-    // con un range di valutazione massima di 5
-    // ogni ciclo rappresenta il riempimento di una stellina
-    //  --> se la valutazione è maggiore dell'indice del ciclo
-    //      --> stellina piena
-    //  --> altrimenti
-    //      --> stellina vuota
-    // return: stelle formattate
-    function generaStelle(valutazione) {
+    //  --> voto: come argomento gli passo un numero che identifica una media voto
+    // Il voto che ricevo dall'API è su una scala da 0 a 10
+    // il mio range di valutazione invece va da 0 a 5
+    //  --> per prima cosa divido per 2 il voto ricevuto e lo arrotondo per eccesso
+    //  --> faccio un ciclo for per visualizzare la valutazione con delle stelle
+    //      con un range di valutazione massima di 5
+    //      ogni ciclo rappresenta il riempimento di una stellina
+    //        --> se la valutazione è maggiore dell'indice del ciclo
+    //              --> stellina piena
+    //        --> altrimenti
+    //            --> stellina vuota
+    // return: stelle formattate che inserirò nell'oggetto handlebars
+    function generaStelle(voto) {
+
+      var valutazione = Math.ceil(voto / 2);
       var rangeValutazione = 5;
       var stelle = '';
+
       for (var i = 1; i <= rangeValutazione; i++) {
 
         if (i <= valutazione) {
@@ -254,6 +305,7 @@ $(document).ready(
       }
       return lingua;
     }
+
     ////////// STAMPA ERRORE
     // Funzione che stampa un messaggio di errore
     //  --> messaggio: è una stringa che contiene il messaggio da visualizzare
