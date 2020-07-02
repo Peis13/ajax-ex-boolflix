@@ -172,35 +172,18 @@ $(document).ready(
         var lingua = singoloFilmAPI.original_language;
         var voto = singoloFilmAPI.vote_average;
 
-        ////////// Lista lingue
-        var listaLingue = [
-          'de',
-          'en',
-          'es',
-          'fr',
-          'it',
-          'pt',
-          'zh'
-        ];
-
-        if (listaLingue.includes(lingua)) {
-
-          lingua = '<img class="bandiera" src="img/' + lingua + '.png" alt="">';
-        }
-
         // Il voto che ricevo dall'API è su una scala da 0 a 10
         // il mio range di valutazione invece va da 0 a 5
         //  --> per prima cosa divido per 2 il voto ricevuto e lo arrotondo per eccesso
         //  --> quindi genero le stelle che inserirò nell'oggetto handlebars
         var valutazione = Math.ceil(voto / 2);
-        var stelle = generaStelle(valutazione);
 
         ////////// Oggetto Handlebars
         var singoloFilm = {
           titolo_originale: titoloOriginale,
           titolo: titolo,
-          lingua: lingua,
-          valutazione: stelle
+          lingua: stampaBandiera(lingua),
+          valutazione: generaStelle(valutazione)
         };
 
         // $('.bandiera').on('error', function() {
@@ -243,6 +226,34 @@ $(document).ready(
       return stelle;
     }
 
+    ////////// STAMPA BANDIERA
+    // Funzione che genera un'immagine di bandiera in base alla lingua
+    //  --> lingua: stringa che passo come argomento per controllare
+    //      se è disponibile la bandiera di quella lingua stessa
+    // se la lingua che gli passo è presente nell'array 'listaLingue'
+    //  --> creo una stringa con tag html di un'immagine
+    //      che ha come attributo 'src' la lingua corrispondente all'immagine in cartella
+    //  --> altrimenti la lingua rimarrà la sigla che torna dall'API
+    // return: stringa da passare all'oggetto gestito da handlebars
+    function stampaBandiera(lingua) {
+
+      ////////// Lista lingue
+      var listaLingue = [
+        'de',
+        'en',
+        'es',
+        'fr',
+        'it',
+        'pt',
+        'zh'
+      ];
+
+      if (listaLingue.includes(lingua)) {
+
+        lingua = '<img class="bandiera" src="img/' + lingua + '.png" alt="">';
+      }
+      return lingua;
+    }
     ////////// STAMPA ERRORE
     // Funzione che stampa un messaggio di errore
     //  --> messaggio: è una stringa che contiene il messaggio da visualizzare
