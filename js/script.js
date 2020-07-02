@@ -79,6 +79,14 @@ $(document).ready(
         }
       }
     );
+
+
+
+    // $(document).on('error', '.bandiera', function(){
+    //   console.log($(this));
+    //   $('.lingua img').replaceWith(55)
+    //
+    // });
                         // ----- Fine Ricerca Film ----- //
 
     // -------------------------- FINE LOGICA -------------------------- //
@@ -164,6 +172,22 @@ $(document).ready(
         var lingua = singoloFilmAPI.original_language;
         var voto = singoloFilmAPI.vote_average;
 
+        ////////// Lista lingue
+        var listaLingue = [
+          'de',
+          'en',
+          'es',
+          'fr',
+          'it',
+          'pt',
+          'zh'
+        ];
+
+        if (listaLingue.includes(lingua)) {
+
+          lingua = '<img class="bandiera" src="img/' + lingua + '.png" alt="">';
+        }
+
         // Il voto che ricevo dall'API è su una scala da 0 a 10
         // il mio range di valutazione invece va da 0 a 5
         //  --> per prima cosa divido per 2 il voto ricevuto e lo arrotondo per eccesso
@@ -178,13 +202,13 @@ $(document).ready(
           lingua: lingua,
           valutazione: stelle
         };
-        console.log(lingua);
 
-        $('.lingua img').on('error', function() {
-          console.log(this);
-          // $(this).attr('src', 'img/it.png')
-          // $(this).parent().append(lingua)
-        }).parent().append(lingua);
+        // $('.bandiera').on('error', function() {
+        //   // console.log($(this));
+        //   // var lingua = $('.lingua img').attr('data-lingua')
+        //   // console.log(lingua);
+        //   $(this).attr('src', 'img/it.png')
+        // })
 
         // Stampo nell'html singoloFilm
         var html = template(singoloFilm);
