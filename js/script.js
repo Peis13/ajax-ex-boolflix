@@ -67,6 +67,7 @@ $(document).ready(
 
         var film = 'movie';
         var serieTV = 'tv';
+        resetHtml()
 
         // valore della input inserito nel campo ricerca
         var parolaCercata = $('#ricerca').val();
@@ -88,6 +89,7 @@ $(document).ready(
         var serieTV = 'tv';
 
         if ((event.which === 13) || (event.keyCode === 13)) {
+          resetHtml()
 
           // valore della input inserito nel campo ricerca
           var parolaCercata = $('#ricerca').val();
@@ -114,7 +116,6 @@ $(document).ready(
     //      per generare la query all'API
     // return: niente
     function ottieniVideo(tipologia, parolaCercata) {
-      resetHtml() // TODO: chiedere se va bene qui nel caso in cui ho due chiamate
 
       ////////// Info chiamata
       // metto i dettagli della chamata Ajax in delle variabili
@@ -141,11 +142,18 @@ $(document).ready(
               stampaVideo(arrayObjVideo, tipologia);
             } else {
 
-              ////////// Imposto un messaggio di errore
-              var messaggioErrore = 'Errore, non è stato trovato nessun film';
-              stampaErrore(messaggioErrore);
-            }
+              if (tipologia == 'movie') {
 
+                ////////// Imposto un messaggio di errore
+                var messaggioErrore = 'Errore, non è stato trovato nessun film';
+                stampaErrore(messaggioErrore);
+              } else {
+
+                ////////// Imposto un messaggio di errore
+                var messaggioErrore = 'Errore, non è stato trovato nessuna serie TV';
+                stampaErrore(messaggioErrore);
+              }
+            }
           },
           error: function() {
 
@@ -164,45 +172,17 @@ $(document).ready(
     // return: niente
     function stampaVideo(arrayObj, tipologia) {
 
-      // Preparo il template handlebars che passerò alle funzioni
-      // in base alla tipologia di video da stampare
+      // Preparo il template handlebars
+      // a cui darò in pasto il mio singoloVideo formattato
       var source = $("#film-template").html();
       var template = Handlebars.compile(source);
 
-      switch (tipologia) {
-        case 'movie':
-        stampaFilm(arrayObj, template);
-          break;
-        case 'tv':
-        stampaSerieTV(arrayObj, template);
-          break;
-        default:  // TODO: cosa ci potrei mettere?
-      }
-    }
-
-    ////////// OTTIENI URL IMMAGINI
-    // Funzione che concatena due stringhe
-    // che servono per formare un percorso parziale
-    // per la ricerca delle copertine video
-    // return: stringa percorso parziale
-    function ottieniUrlImmagini() {
-
+      ////////// Url parziale
+      // Queste due stringhe servono per formare un percorso parziale
+      // per la ricerca delle copertine video
       var urlBaseImmagine = 'https://image.tmdb.org/t/p/';
       var formatoImmagine = 'w500';  // Array ["w92", "w154", "w185", "w342", "w500", "w780", "original"]
-
-      return urlBaseImmagine + formatoImmagine;
-    }
-
-    ////////// STAMPA FILM
-    // Funzione che stampa a schermo i dettagli del film
-    //  --> arrayObj: array di oggetti che serve alla funzione come argomento
-    //  --> template: funzione che serve per stampare il template handlebars
-    //      a cui darò in pasto il mio singoloFilm formattato
-    // Creo una lista di variabili che corrispondono ai valori di ritono della chiamata.
-    // Queste variabili diventano poi i valori del nuovo oggetto che andrò a stampare
-    // return: niente
-    function stampaFilm(arrayObj, template) {
-      var urlParziale = ottieniUrlImmagini();
+      var urlParziale = urlBaseImmagine + formatoImmagine;
 
       // Ciclo gli oggetti dell'array ricevuto
       for (var i = 0; i < arrayObj.length; i++) {
@@ -211,18 +191,36 @@ $(document).ready(
         var singoloVideoAPI = arrayObj[i];
 
         ////////// Lista variabili
+        // Creo una lista di variabili che corrispondono ai valori di ritono della chiamata.
+        // Queste variabili diventano poi i valori del nuovo oggetto che andrò a stampare
         var immagine = singoloVideoAPI.poster_path;
-        var titoloOriginale = singoloVideoAPI.original_title;
-        var titolo = singoloVideoAPI.title;
         var lingua = singoloVideoAPI.original_language;
         var voto = singoloVideoAPI.vote_average;
         var immagineCopertina;
 
+        // in base alla tipologia che mi arriva come argomento,
+        // vado a pescare i titoli che hanno chiavi diverse
+        // in base alla chiamata effettuata in precedenza
+        switch (tipologia) {
+
+          case 'movie':
+          var titoloOriginale = singoloVideoAPI.original_title;
+          var titolo = singoloVideoAPI.title;
+          var tipo = 'Film';
+            break;
+
+          case 'tv':
+          var titoloOriginale = singoloVideoAPI.original_name;
+          var titolo = singoloVideoAPI.name;
+          var tipo = 'Serie TV';
+            break;
+
+          default:  // TODO: cosa ci potrei mettere?
+        }
+
         // controllo che la risposta dell'immagine non sia nulla
-        // se è nulla
-        //  --> imposto un'immagine di default
-        // altrimenti
-        //  --> concateno la risposta all'url parziale
+        //  --> se è nulla imposto un'immagine di default
+        //  --> altrimenti concateno la risposta all'url parziale
         if (immagine == null) {
 
           immagineCopertina = 'img/non_disponibile.png';
@@ -232,71 +230,17 @@ $(document).ready(
         }
 
         ////////// Oggetto Handlebars
-        var singoloFilm = {
+        var singoloVideo = {
           immagine: immagineCopertina,
           titolo_originale: titoloOriginale,
           titolo: titolo,
-          tipologia: 'Film',
+          tipologia: tipo,
           lingua: stampaBandiera(lingua),
           valutazione: generaStelle(voto)
         };
 
-        // Stampo nell'html singoloFilm
-        var html = template(singoloFilm);
-        $('.lista-films').append(html);
-      }
-    }
-
-    ////////// STAMPA SERIE TV
-    // Funzione che stampa a schermo i dettagli della serie TV
-    //  --> arrayObj: array di oggetti che serve alla funzione come argomento
-    //  --> template: funzione che serve per stampare il template handlebars
-    //      a cui darò in pasto il mio singoloFilm formattato
-    // Creo una lista di variabili che corrispondono ai valori di ritono della chiamata.
-    // Queste variabili diventano poi i valori del nuovo oggetto che andrò a stampare
-    // return: niente
-    function stampaSerieTV(arrayObj,template) {
-      var urlParziale = ottieniUrlImmagini();
-
-      // Ciclo gli oggetti dell'array ricevuto
-      for (var i = 0; i < arrayObj.length; i++) {
-
-        ////////// Oggetto API
-        var singoloVideoAPI = arrayObj[i];
-
-        ////////// Lista variabili
-        var immagine = singoloVideoAPI.poster_path;
-        var titoloOriginale = singoloVideoAPI.original_name;
-        var titolo = singoloVideoAPI.name;
-        var lingua = singoloVideoAPI.original_language;
-        var voto = singoloVideoAPI.vote_average;
-        var immagineCopertina;
-
-        // controllo che la risposta dell'immagine non sia nulla
-        // se è nulla
-        //  --> imposto un'immagine di default
-        // altrimenti
-        //  --> concateno la risposta all'url parziale
-        if (immagine == null) {
-
-          immagineCopertina = 'img/non_disponibile.png';
-        } else {
-
-          immagineCopertina = urlParziale + immagine;
-        }
-
-        ////////// Oggetto Handlebars
-        var singoloFilm = {
-          immagine: immagineCopertina,
-          titolo_originale: titoloOriginale,
-          titolo: titolo,
-          tipologia: 'Serie TV',
-          lingua: stampaBandiera(lingua),
-          valutazione: generaStelle(voto)
-        };
-
-        // Stampo nell'html singoloFilm
-        var html = template(singoloFilm);
+        // Stampo nell'html singoloVideo
+        var html = template(singoloVideo);
         $('.lista-films').append(html);
       }
     }
@@ -358,7 +302,7 @@ $(document).ready(
 
       if (listaLingue.includes(lingua)) {
 
-        lingua = '<img class="bandiera" src="img/' + lingua + '.png" alt="">';
+        lingua = '<img class="bandiera" src="img/' + lingua + '.png" alt="' + lingua + '">';
       }
       return lingua;
     }
