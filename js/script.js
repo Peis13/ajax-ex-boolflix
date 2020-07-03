@@ -102,6 +102,26 @@ $(document).ready(
       }
     );
 
+    ////////// Mostra dettagli Video
+    // quando il mouse entra nel singolo video,
+    // mostro i dettagli del video
+    $(document).on('mouseenter', '.singolo-video',
+      function() {
+
+      $(this).children('.dettagli-video').addClass('visibile');
+      }
+    );
+
+    ////////// Nascondi dettagli Video
+    // quando il mouse esce dal singolo video,
+    // mostro i dettagli del video
+    $(document).on('mouseleave', '.singolo-video',
+      function() {
+
+      $(this).children('.dettagli-video').removeClass('visibile');
+      }
+    );
+
                         // ----- Fine Ricerca Film ----- //
 
     // -------------------------- FINE LOGICA -------------------------- //
@@ -196,7 +216,7 @@ $(document).ready(
         var immagine = singoloVideoAPI.poster_path;
         var lingua = singoloVideoAPI.original_language;
         var voto = singoloVideoAPI.vote_average;
-        var immagineCopertina;
+        var trama = singoloVideoAPI.overview;
 
         // in base alla tipologia che mi arriva come argomento,
         // vado a pescare i titoli che hanno chiavi diverse
@@ -219,6 +239,7 @@ $(document).ready(
         // controllo che la risposta dell'immagine non sia nulla
         //  --> se è nulla imposto un'immagine di default
         //  --> altrimenti concateno la risposta all'url parziale
+        var immagineCopertina;
         if (immagine == null) {
 
           immagineCopertina = 'img/non_disponibile.png';
@@ -234,7 +255,8 @@ $(document).ready(
           titolo: titolo,
           tipologia: tipo,
           lingua: stampaBandiera(lingua),
-          valutazione: generaStelle(voto)
+          valutazione: generaStelle(voto),
+          trama: trama
         };
 
         // Stampo nell'html singoloVideo
@@ -267,10 +289,10 @@ $(document).ready(
 
         if (i <= valutazione) {
 
-          stelle += '<i class="fas fa-star"></i>';
+          stelle += '<i class="fas fa-star stella"></i>';
         } else {
 
-          stelle += '<i class="far fa-star"></i>';
+          stelle += '<i class="far fa-star stella"></i>';
         }
       }
       return stelle;

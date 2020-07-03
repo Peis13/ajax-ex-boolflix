@@ -5,39 +5,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Boolflix</title>
     <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Karla&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.6/handlebars.js"></script>
   </head>
   <body>
 
-    <!-- Ricerca -->
-    <div class="input ricerca">
-      <label>Nome film:</label>
-      <input id="ricerca" type="text" value="">
-      <button id="cerca" class="btn" type="button">Cerca</button>
-    </div>
-    <!-- Fine Ricerca -->
+    <!-- HEADER -->
+    <header>
+      <div class="header container">
 
-    <!-- Lista Film -->
-    <label>Video trovati:</label>
-    <ul class="lista-films"></ul>
-    <!-- Fine Lista Film -->
+        <!-- Logo -->
+        <div class="logo">
+          <span>boolflix</span>
+        </div>
+        <!-- Fine Logo -->
+
+        <!-- Ricerca Film-->
+        <div class="input ricerca">
+          <input id="ricerca" type="text" placeholder="Inserisci il titolo di un film">
+          <i id="cerca" class="fas fa-search"></i>
+        </div>
+        <!-- Fine Ricerca Film-->
+      </div>
+    </header>
+    <!-- FINE HEADER -->
+
+    <!-- MAIN -->
+    <main>
+      <div class="main container">
+
+        <!-- Lista Film -->
+        <label>Video trovati:</label>
+        <ul class="lista-films"></ul>
+        <!-- Fine Lista Film -->
+      </div>
+    </main>
+    <!-- FINE MAIN -->
+
+
 
     <!-- TEMPLATE HANDLEBARS -->
     <!-- Film -->
     <script id="film-template" type="text/x-handlebars-template">
-      <li class="singolo-film">
-        <ul class="dettagli-film">
-          <li><img class="copertina" src="{{ immagine }}" alt="{{ titolo }}"></li>
-          <li>Titolo: {{ titolo }}</li>
-          <li>Titolo originale: {{ titolo_originale }}</li>
-          <li>Tipologia: {{ tipologia }}</li>
-          <li class="lingua">Lingua: {{{ lingua }}}</li>
-          <li>Voto: {{{ valutazione }}}</li>
+      <li class="singolo-video">
+        <img class="copertina" src="{{ immagine }}" alt="{{ titolo }}">
+
+        <!-- dettagli film -->
+        <ul class="dettagli-video">
+          <li class="titolo">
+            {{ titolo }}
+           </li>
+          <li class="titolo-originale">
+            <h5>Titolo originale:&nbsp;</h5>
+           {{ titolo_originale }}
+           </li>
+          <li class="tipologia">
+            {{ tipologia }}
+           </li>
+          <li class="lingua">
+            <h5>Lingua:&nbsp;</h5>
+           {{{ lingua }}}
+           </li>
+          <li class="voto">
+            {{{ valutazione }}}
+           </li>
+          <li class="trama">
+            <h5>Trama:</h5>
+            <div class="descrizione">{{{ trama }}}</div>
+          </li>
         </ul>
+        <!-- fine dettagli film -->
       </li>
     </script>
+    <!-- Fine Film -->
 
     <!-- Messaggio di errore -->
     <script id="messaggio-template" type="text/x-handlebars-template">
