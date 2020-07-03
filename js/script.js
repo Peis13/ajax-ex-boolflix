@@ -181,7 +181,7 @@ $(document).ready(
       // Queste due stringhe servono per formare un percorso parziale
       // per la ricerca delle copertine video
       var urlBaseImmagine = 'https://image.tmdb.org/t/p/';
-      var formatoImmagine = 'w500';  // Array ["w92", "w154", "w185", "w342", "w500", "w780", "original"]
+      var formatoImmagine = 'w342';  // Array ["w92", "w154", "w185", "w342", "w500", "w780", "original"]
       var urlParziale = urlBaseImmagine + formatoImmagine;
 
       // Ciclo gli oggetti dell'array ricevuto
@@ -214,8 +214,6 @@ $(document).ready(
           var titolo = singoloVideoAPI.name;
           var tipo = 'Serie TV';
             break;
-
-          default:  // TODO: cosa ci potrei mettere?
         }
 
         // controllo che la risposta dell'immagine non sia nulla
