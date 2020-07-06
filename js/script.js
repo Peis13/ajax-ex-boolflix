@@ -97,6 +97,7 @@ $(document).ready(
           var parolaCercata = $('#ricerca').val();
           ottieniVideo(film, parolaCercata);
           ottieniVideo(serieTV, parolaCercata);
+          // ottieniCrediti();
 
           // infine cancello il testo scritto nella input
           resetInput();
@@ -188,6 +189,35 @@ $(document).ready(
           }
         }
       );
+
+      $('.singolo-video').each(
+        function() {
+          console.log($(this));
+          // var dataID = $(this).attr('data-id');
+          //
+          // ////////// Info chiamata
+          // // metto i dettagli della chamata Ajax in delle variabili
+          // var url = 'https://api.themoviedb.org/3/' + dataID + '/credits'; // movie/214756
+          // var api_key = '4cc6118b11d73c4c0274675794143586';
+          //
+          // $.ajax(
+          //   {
+          //     url: url,
+          //     method: 'GET',
+          //     data: {
+          //       api_key: api_key,
+          //       language: 'it-IT'
+          //     },
+          //     success: function(rispostaAPI) {
+          //       console.log(rispostaAPI);
+          //     },
+          //     error: function() {
+          //       alert('nessun ID corrispondente trovato');
+          //     }
+          //   }
+          // );
+        }
+      );
     }
 
     ////////// STAMPA VIDEO
@@ -215,6 +245,7 @@ $(document).ready(
         var lingua = singoloVideoAPI.original_language;
         var voto = singoloVideoAPI.vote_average;
         var trama = singoloVideoAPI.overview;
+        var id = singoloVideoAPI.id;
 
         // in base alla tipologia che mi arriva come argomento,
         // vado a pescare i titoli che hanno chiavi diverse
@@ -242,7 +273,8 @@ $(document).ready(
           tipologia: tipo,
           lingua: stampaBandiera(lingua),
           valutazione: generaStelle(voto),
-          trama: trama
+          trama: trama,
+          id_video: tipologia + '/' + id
         };
 
         // Stampo nell'html singoloVideo
@@ -250,6 +282,41 @@ $(document).ready(
         $('.lista-films').append(html);
       }
     }
+
+    ////////// STAMPA CREDITI
+    // function ottieniCrediti() {
+    //
+    //   $('.singolo-video').each(
+    //     function() {
+    //
+    //       var dataID = $(this).attr('data-id');
+    //
+    //       ////////// Info chiamata
+    //       // metto i dettagli della chamata Ajax in delle variabili
+    //       var url = 'https://api.themoviedb.org/3/' + dataID + '/credits'; // movie/214756
+    //       var api_key = '4cc6118b11d73c4c0274675794143586';
+    //
+    //       $.ajax(
+    //         {
+    //           url: url,
+    //           method: 'GET',
+    //           data: {
+    //             api_key: api_key,
+    //             language: 'it-IT'
+    //           },
+    //           success: function(rispostaAPI) {
+    //             console.log(rispostaAPI);
+    //           },
+    //           error: function() {
+    //             alert('nessun ID corrispondente trovato');
+    //           }
+    //         }
+    //       );
+    //     }
+    //   );
+    //
+    // }
+
 
     ////////// GENERA STELLE
     // Funzione che genera delle stelle
@@ -275,10 +342,10 @@ $(document).ready(
 
         if (i <= valutazione) {
 
-          stelle += '<i class="fas fa-star stella"></i>';
+          stelle += '<i class="fas fa-star"></i>';
         } else {
 
-          stelle += '<i class="far fa-star stella"></i>';
+          stelle += '<i class="far fa-star"></i>';
         }
       }
       return stelle;

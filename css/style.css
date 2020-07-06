@@ -179,8 +179,10 @@ li.tipologia {
   width: 30px;
 }
 
-.stella {
+.voto {
   color: yellow;
+  font-size: 12px;
+  letter-spacing: 3px;
 }
 /* fine dettagli singolo video */
 /* FINE MAIN */
