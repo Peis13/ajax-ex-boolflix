@@ -64,28 +64,29 @@
 
     <!-- Film -->
     <script id="film-template" type="text/x-handlebars-template">
-      <li data-ID="{{ id_video }}" class="singolo-video">
+      <li data-tipologia="{{ tipologia_api }}" data-ID="{{ id_video }}" class="singolo-video">
         <img class="copertina" src="{{ immagine }}" alt="{{ titolo }}">
 
         <!-- dettagli film -->
         <ul class="dettagli-video">
           <li class="titolo">
             {{ titolo }}
-           </li>
+          </li>
           <li class="titolo-originale">
             <h5>Titolo originale:&nbsp;</h5>
            {{ titolo_originale }}
-           </li>
+          </li>
+          <li class="generi"></li>
           <li class="tipologia">
             {{ tipologia }}
-           </li>
+          </li>
           <li class="lingua">
             <h5>Lingua:&nbsp;</h5>
            {{{ lingua }}}
-           </li>
+          </li>
           <li class="voto">
             {{{ valutazione }}}
-           </li>
+          </li>
           <li class="trama">
             <h5>Trama:</h5>
             <div class="descrizione">{{{ trama }}}</div>
@@ -95,6 +96,17 @@
       </li>
     </script>
     <!-- Fine Film -->
+
+    <!-- Generi singolo video -->
+    <script id="generi-template" type="text/x-handlebars-template">
+      <ul class="lista-generi">
+        {{#each generi}}
+          <li class="singolo-genere">
+            {{ this }}
+          </li>
+        {{/each}}
+      </ul>
+    </script>
 
     <!-- Messaggio di errore -->
     <script id="messaggio-template" type="text/x-handlebars-template">

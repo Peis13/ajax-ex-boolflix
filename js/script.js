@@ -97,7 +97,6 @@ $(document).ready(
           var parolaCercata = $('#ricerca').val();
           ottieniVideo(film, parolaCercata);
           ottieniVideo(serieTV, parolaCercata);
-          // ottieniCrediti();
 
           // infine cancello il testo scritto nella input
           resetInput();
@@ -189,35 +188,6 @@ $(document).ready(
           }
         }
       );
-
-      $('.singolo-video').each(
-        function() {
-          console.log($(this));
-          // var dataID = $(this).attr('data-id');
-          //
-          // ////////// Info chiamata
-          // // metto i dettagli della chamata Ajax in delle variabili
-          // var url = 'https://api.themoviedb.org/3/' + dataID + '/credits'; // movie/214756
-          // var api_key = '4cc6118b11d73c4c0274675794143586';
-          //
-          // $.ajax(
-          //   {
-          //     url: url,
-          //     method: 'GET',
-          //     data: {
-          //       api_key: api_key,
-          //       language: 'it-IT'
-          //     },
-          //     success: function(rispostaAPI) {
-          //       console.log(rispostaAPI);
-          //     },
-          //     error: function() {
-          //       alert('nessun ID corrispondente trovato');
-          //     }
-          //   }
-          // );
-        }
-      );
     }
 
     ////////// STAMPA VIDEO
@@ -228,7 +198,7 @@ $(document).ready(
     function stampaVideo(arrayObj, tipologia) {
 
       // Preparo il template handlebars
-      // a cui darò in pasto il mio singoloVideo formattato
+      // a cui darò in pasto il mio oggetto singoloVideo formattato
       var source = $("#film-template").html();
       var template = Handlebars.compile(source);
 
@@ -270,52 +240,133 @@ $(document).ready(
           immagine: stampaImmagine(immagine),
           titolo_originale: titoloOriginale,
           titolo: titolo,
+          tipologia_api: tipologia,
           tipologia: tipo,
           lingua: stampaBandiera(lingua),
           valutazione: generaStelle(voto),
           trama: trama,
-          id_video: tipologia + '/' + id
+          id_video: id
         };
 
         // Stampo nell'html singoloVideo
         var html = template(singoloVideo);
         $('.lista-films').append(html);
+        // console.log(singoloVideo.id_video);
       }
+      ottieniCrediti()
     }
 
-    ////////// STAMPA CREDITI
-    // function ottieniCrediti() {
-    //
-    //   $('.singolo-video').each(
-    //     function() {
-    //
-    //       var dataID = $(this).attr('data-id');
-    //
-    //       ////////// Info chiamata
-    //       // metto i dettagli della chamata Ajax in delle variabili
-    //       var url = 'https://api.themoviedb.org/3/' + dataID + '/credits'; // movie/214756
-    //       var api_key = '4cc6118b11d73c4c0274675794143586';
-    //
-    //       $.ajax(
-    //         {
-    //           url: url,
-    //           method: 'GET',
-    //           data: {
-    //             api_key: api_key,
-    //             language: 'it-IT'
-    //           },
-    //           success: function(rispostaAPI) {
-    //             console.log(rispostaAPI);
-    //           },
-    //           error: function() {
-    //             alert('nessun ID corrispondente trovato');
-    //           }
-    //         }
-    //       );
-    //     }
-    //   );
-    //
-    // }
+    ////////// OTTIENI CREDITI
+    // Funzione che effettua una chiamata per ogni video già stampato
+    // per ottenere informazioni sul genere e sugli attori
+    //  --> credito: stringa che identifica il tipo di credito che si vuole ottenere
+    // return: niente
+    function ottieniCrediti() {
+
+      $('.singolo-video').each(
+        function() {
+
+          var attrTipologia = $(this).attr('data-tipologia');
+          var attrID = $(this).attr('data-id');
+
+          // in base a quale info voglio ottenere,
+          // vado a formare il percorso per la chiamata ajax
+          var chiamataGeneri = attrTipologia + '/' + attrID;
+          var chiamataAttori = chiamataGeneri + '/credits';
+
+          ottieniGeneri(chiamataGeneri, attrID);
+          ottieniAttori(chiamataAttori);
+        }
+      );
+    }
+
+    // OTTIENI GENERI
+    // Chiamata per ottenere il genere di ogni video
+    //  --> percorsoParziale: stringa che serve per l'indirizzamento della chiamata
+    //  --> attrID: stringa che serve per l'indirizzamento del template handlebars
+    // return: niente
+    function ottieniGeneri(percorsoParziale, attrID) {
+
+      ////////// Info chiamata
+      // metto i dettagli della chamata Ajax in delle variabili
+      var url = 'https://api.themoviedb.org/3/' + percorsoParziale; // movie/214756
+      var api_key = '4cc6118b11d73c4c0274675794143586';
+
+      $.ajax(
+        {
+          url: url,
+          method: 'GET',
+          data: {
+            api_key: api_key,
+            language: 'it-IT'
+          },
+          success: function(rispostaAPI) {
+
+            ////////// Array di ritorno chiamata Ajax
+            var arrayObjGeneri = rispostaAPI.genres;
+
+            if (arrayObjGeneri.length > 0) {
+
+              // Preparo il template handlebars
+              // a cui darò in pasto il mio oggetto singoloVideoGeneri formattato
+              var source = $("#generi-template").html();
+              var template = Handlebars.compile(source);
+
+              var listaGeneri = [];
+              for (var i = 0; i < arrayObjGeneri.length; i++) {
+
+                var genere = arrayObjGeneri[i].name;
+                listaGeneri.push(genere);
+              }
+
+              ////////// Oggetto Handlebars
+              var singoloVideoGeneri = {
+                generi: listaGeneri
+              }
+
+              // Stampo nell'html singoloVideo
+              var html = template(singoloVideoGeneri);
+              console.log(html);
+              $('.singolo-video[data-id="' + attrID + '"]').find('.generi').append(html);
+            }
+          },
+          error: function() {
+            alert('nessun ID corrispondente trovato');
+          }
+        }
+      );
+    }
+
+    // OTTIENI ATTORI
+    // Chiamata per ottenere gli attori di ogni video
+    //  --> percorsoParziale: stringa che serve per l'indirizzamento della chiamata
+    // return: niente
+    function ottieniAttori(percorsoParziale) {
+
+      ////////// Info chiamata
+      // metto i dettagli della chamata Ajax in delle variabili
+      var url = 'https://api.themoviedb.org/3/' + percorsoParziale; // movie/214756
+      var api_key = '4cc6118b11d73c4c0274675794143586';
+
+      $.ajax(
+        {
+          url: url,
+          method: 'GET',
+          data: {
+            api_key: api_key,
+            language: 'it-IT'
+          },
+          success: function(rispostaAPI) {
+            // console.log(rispostaAPI);
+
+
+          },
+          error: function() {
+            alert('nessun ID corrispondente trovato');
+          }
+        }
+      );
+    }
 
 
     ////////// GENERA STELLE

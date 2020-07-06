@@ -184,5 +184,9 @@ li.tipologia {
   font-size: 12px;
   letter-spacing: 3px;
 }
+
+.lista-generi li {
+  display: inline-block;
+}
 /* fine dettagli singolo video */
 /* FINE MAIN */
