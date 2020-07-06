@@ -25,6 +25,23 @@ ul {
   width: 90%;
   margin: auto;
 }
+
+/* Scrollbar */
+/* width */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: gray;
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #b30000;
+}
 /* FINE STILI GENERALI */
 
 /* HEADER */
@@ -42,7 +59,7 @@ header {
 }
 
 .logo {
-  color: red;
+  color: #b30000;
   font-size: 40px;
   font-weight: bold;
   text-transform: uppercase;
@@ -60,6 +77,14 @@ header {
   height: 100%;
   padding: 5px;
   font-size: 16px;
+  color: #fff;
+  border-radius: 5px;
+  border: 1px solid #b30000;
+  background-color: #000;
+}
+
+#ricerca:focus {
+  outline: none;
 }
 
 #cerca {
@@ -86,6 +111,7 @@ main {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  margin-top: 20px;
 }
 
 .singolo-video {

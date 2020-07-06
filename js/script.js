@@ -67,7 +67,8 @@ $(document).ready(
 
         var film = 'movie';
         var serieTV = 'tv';
-        resetHtml()
+        resetHtml($('.numero-video'))
+        resetHtml($('.lista-films'))
 
         // valore della input inserito nel campo ricerca
         var parolaCercata = $('#ricerca').val();
@@ -89,7 +90,8 @@ $(document).ready(
         var serieTV = 'tv';
 
         if ((event.which === 13) || (event.keyCode === 13)) {
-          resetHtml()
+          resetHtml($('.numero-video'))
+          resetHtml($('.lista-films'))
 
           // valore della input inserito nel campo ricerca
           var parolaCercata = $('#ricerca').val();
@@ -152,9 +154,12 @@ $(document).ready(
             language: 'it-IT'
           },
           success: function(rispostaAPI) {
+            // console.log(rispostaAPI);
 
             ////////// Array di ritorno chiamata Ajax
             var arrayObjVideo = rispostaAPI.results;
+
+            stampaNumeroVideo(rispostaAPI, tipologia)
 
             // Se l'array che mi torna è vuoto, stampo un messaggio di errore
             if (arrayObjVideo.length > 0) {
@@ -197,13 +202,6 @@ $(document).ready(
       var source = $("#film-template").html();
       var template = Handlebars.compile(source);
 
-      ////////// Url parziale
-      // Queste due stringhe servono per formare un percorso parziale
-      // per la ricerca delle copertine video
-      var urlBaseImmagine = 'https://image.tmdb.org/t/p/';
-      var formatoImmagine = 'w342';  // Array ["w92", "w154", "w185", "w342", "w500", "w780", "original"]
-      var urlParziale = urlBaseImmagine + formatoImmagine;
-
       // Ciclo gli oggetti dell'array ricevuto
       for (var i = 0; i < arrayObj.length; i++) {
 
@@ -236,21 +234,9 @@ $(document).ready(
             break;
         }
 
-        // controllo che la risposta dell'immagine non sia nulla
-        //  --> se è nulla imposto un'immagine di default
-        //  --> altrimenti concateno la risposta all'url parziale
-        var immagineCopertina;
-        if (immagine == null) {
-
-          immagineCopertina = 'img/non_disponibile.png';
-        } else {
-
-          immagineCopertina = urlParziale + immagine;
-        }
-
         ////////// Oggetto Handlebars
         var singoloVideo = {
-          immagine: immagineCopertina,
+          immagine: stampaImmagine(immagine),
           titolo_originale: titoloOriginale,
           titolo: titolo,
           tipologia: tipo,
@@ -327,6 +313,71 @@ $(document).ready(
       return lingua;
     }
 
+    ////////// STAMPA IMMAGINE COPERTINA
+    // Trasforma il valore di poster_path ricevuto dall'API in un perscorso
+    // da stampare con handlebars
+    //  --> immagineAPI: può essere una stringa o null (se il film non ha immagine di copertina)
+    // return: una stringa pronta per essere stampata in handlebars
+    function stampaImmagine(immagineAPI) {
+
+      ////////// Url parziale
+      // Queste due stringhe servono per formare un percorso parziale
+      // per la ricerca delle copertine video
+      var urlBaseImmagine = 'https://image.tmdb.org/t/p/';
+      var formatoImmagine = 'w342';  // Array ["w92", "w154", "w185", "w342", "w500", "w780", "original"]
+      var urlParziale = urlBaseImmagine + formatoImmagine;
+
+      // controllo che la risposta dell'immagine non sia nulla
+      //  --> se è nulla imposto un'immagine di default
+      //  --> altrimenti concateno la risposta all'url parziale
+      if (immagineAPI == null) {
+
+        var immagineCopertina = 'img/non_disponibile.png';
+      } else {
+
+        var immagineCopertina = urlParziale + immagineAPI;
+      }
+      return immagineCopertina;
+    }
+
+    ////////// STAMPA NUMERO VIDEO TROVATI
+    // Funzione che stampa il numero di video ricevuti dalla ricerca
+    // e il numero di pagine di video che ricevo dalla chiamata ajax
+    //  --> rispostaAPI: è un oggetto ricevuto dalla richiesta all'API
+    //  --> tipologia: stringa che rappresenta la tipologia di video
+    // return: niente
+    function stampaNumeroVideo(rispostaAPI, tipologia) {
+
+      // Preparo il template handlebars
+      // a cui darò in pasto il messaggio da stampare
+      var source = $("#info-template").html();
+      var template = Handlebars.compile(source);
+
+      // in base alla tipologia che mi arriva come argomento,
+      // vado a scrivere la info della tipologia di risposta
+      switch (tipologia) {
+
+        case 'movie':
+        var tipo = 'Film';
+          break;
+
+        case 'tv':
+        var tipo = 'Serie TV';
+          break;
+      }
+      var numeroVideo = rispostaAPI.total_results;
+
+      ////////// Oggetto Handlebars
+      var videoTrovati = {
+        info: tipo,
+        numero_video: numeroVideo
+      };
+
+      // Stampo nell'html il messaggio di errore
+      var html = template(videoTrovati);
+      $('.numero-video').append(html);
+    }
+
     ////////// STAMPA ERRORE
     // Funzione che stampa un messaggio di errore
     //  --> messaggio: è una stringa che contiene il messaggio da visualizzare
@@ -350,8 +401,8 @@ $(document).ready(
 
     ////////// RESET HTML
     // Funzione che svuota la lista dei film trovati per non accodare nuove ricerche
-    function resetHtml() {
-      $('.lista-films').html('');
+    function resetHtml(selettore) {
+      selettore.html('');
     }
 
     ////////// RESET INPUT

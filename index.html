@@ -36,8 +36,19 @@
     <main>
       <div class="main container">
 
+        <!-- Slider pagine -->
+        <!-- <span class="pagine">
+          <i class="fas fa-chevron-left precedente"></i>
+          {{ numero_pagina }}
+          <i class="fas fa-chevron-right successivo"></i>
+        </span> -->
+        <!-- Fine Slider pagine -->
+
+        <!-- Numero video -->
+        <div class="numero-video"></div>
+        <!-- Fine Numero video -->
+
         <!-- Lista Film -->
-        <label>Video trovati:</label>
         <ul class="lista-films"></ul>
         <!-- Fine Lista Film -->
       </div>
@@ -45,8 +56,12 @@
     <!-- FINE MAIN -->
 
 
-
     <!-- TEMPLATE HANDLEBARS -->
+    <!-- Video trovati -->
+    <script id="info-template" type="text/x-handlebars-template">
+      <p class="video-trovati">{{ info }} ({{ numero_video }})</p>
+    </script>
+
     <!-- Film -->
     <script id="film-template" type="text/x-handlebars-template">
       <li class="singolo-video">
@@ -85,6 +100,14 @@
     <script id="messaggio-template" type="text/x-handlebars-template">
       <p class="errore">{{ messaggio }}</p>
     </script>
+
+
+    <!-- Pagine -->
+    <!-- <script id="pagine-template" type="text/x-handlebars-template">
+      <span class="pagina">
+        {{ numero_pagina }}
+      </span>
+    </script> -->
 
     <!-- link javascript -->
     <script type="text/javascript" src="js/script.js"></script>
